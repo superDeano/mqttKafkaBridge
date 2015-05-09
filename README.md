@@ -8,18 +8,18 @@ Bridge which consumes MQTT messages and republishes them on Kafka on the same to
 
 Where `options` are:
 
-    --help (-h)  : Show help
-    --id VAL     : MQTT Client ID
-    --topics VAL : MQTT topic filters (comma-separated)
-    --uri VAL    : MQTT Server URI
-    --zk VAL     : Zookeeper connect string
+    --help (-h)               : Show help
+    --id VAL                  : MQTT Client ID
+    --topics VAL              : MQTT topic filters (comma-separated)
+    --uri VAL                 : MQTT Server URI
+    --brokerlist (-b) VAL     : Kafka Broker List (comma-separated)
 
 If you don't specify any command-line options, it uses the following defaults:
 
     id:      mqttKafkaBridge
     topics:  '#' (all topics)
     uri:     tcp://localhost:1883
-    zk:      localhost:2181
+    b:       localhost:9092
 
 ***Note***: you can't run more than one bridge using the default settings, since two clients cannot connect to the same MQTT server with the same client ID. Additionally, you will get multiple messages published to Kafka for each message published to MQTT. If you wish to run multiple instances, you'll need to divide up the topics among the instances, and make sure to give them different IDs.
 
