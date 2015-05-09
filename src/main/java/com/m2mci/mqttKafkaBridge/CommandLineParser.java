@@ -9,7 +9,7 @@ import org.kohsuke.args4j.Option;
 
 public class CommandLineParser {
 	private static final String ALL_MQTT_TOPICS = "#";
-	private static final String DEFAULT_ZOOKEEPER_CONNECT = "localhost:2181";
+	private static final String DEFAULT_BROKER_LIST = "localhost:9092";
 	private static final String DEFAULT_MQTT_SERVER_URI = "tcp://localhost:1883";
 
 	@Option(name="--id", usage="MQTT Client ID")
@@ -18,8 +18,8 @@ public class CommandLineParser {
 	@Option(name="--uri", usage="MQTT Server URI")
 	private String serverURI = DEFAULT_MQTT_SERVER_URI;
 
-	@Option(name="--zk", usage="Zookeeper connect string")
-	private String zkConnect = DEFAULT_ZOOKEEPER_CONNECT;
+	@Option(name="--brokerlist", aliases="-b", usage="Broker list (comma-separated)")
+	private String brokerList = DEFAULT_BROKER_LIST;
 	
 	@Option(name="--topics", usage="MQTT topic filters (comma-separated)")
 	private String mqttTopicFilters = ALL_MQTT_TOPICS;
@@ -37,8 +37,8 @@ public class CommandLineParser {
 		return serverURI;
 	}
 
-	public String getZkConnect() {
-		return zkConnect;
+	public String getBrokerList() {
+		return brokerList;
 	}
 
 	public String[] getMqttTopicFilters() {

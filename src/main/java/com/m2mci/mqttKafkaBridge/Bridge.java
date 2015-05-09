@@ -3,8 +3,7 @@ package com.m2mci.mqttKafkaBridge;
 import java.util.Properties;
 
 import kafka.javaapi.producer.Producer;
-import kafka.javaapi.producer.ProducerData;
-import kafka.message.Message;
+import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 
 import org.apache.log4j.Logger;
@@ -19,17 +18,17 @@ import org.kohsuke.args4j.CmdLineException;
 public class Bridge implements MqttCallback {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 	private MqttAsyncClient mqtt;
-	private Producer<String, Message> kafkaProducer;
+	private Producer<String, String> kafkaProducer;
 	
-	private void connect(String serverURI, String clientId, String zkConnect) throws MqttException {
+	private void connect(String serverURI, String clientId, String brokerList) throws MqttException {
 		mqtt = new MqttAsyncClient(serverURI, clientId);
 		mqtt.setCallback(this);
 		IMqttToken token = mqtt.connect();
 		Properties props = new Properties();
-		props.put("zk.connect", zkConnect);
-		props.put("serializer.class", "kafka.serializer.DefaultEncoder");
+                props.put("metadata.broker.list", brokerList);
+		props.put("serializer.class", "kafka.serializer.StringEncoder");
 		ProducerConfig config = new ProducerConfig(props);
-		kafkaProducer = new Producer<String, Message>(config);
+		kafkaProducer = new Producer<String, String>(config);
 		token.waitForCompletion();
 		logger.info("Connected to MQTT and Kafka");
 	}
@@ -75,8 +74,7 @@ public class Bridge implements MqttCallback {
 	@Override
 	public void messageArrived(String topic, MqttMessage message) throws Exception {
 		byte[] payload = message.getPayload();
-		ProducerData<String, Message> data = new ProducerData<String, Message>(topic, new Message(payload));
-		kafkaProducer.send(data);
+                kafkaProducer.send(new KeyedMessage<String, String>(topic, new String(payload)));
 	}
 
 	/**
@@ -88,7 +86,7 @@ public class Bridge implements MqttCallback {
 			parser = new CommandLineParser();
 			parser.parse(args);
 			Bridge bridge = new Bridge();
-			bridge.connect(parser.getServerURI(), parser.getClientId(), parser.getZkConnect());
+			bridge.connect(parser.getServerURI(), parser.getClientId(), parser.getBrokerList());
 			bridge.subscribe(parser.getMqttTopicFilters());
 		} catch (MqttException e) {
 			e.printStackTrace(System.err);
