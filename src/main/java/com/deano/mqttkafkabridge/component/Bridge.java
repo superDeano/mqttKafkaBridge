@@ -100,7 +100,7 @@ public class Bridge implements MqttCallback {
         }
     }
 
-    private void reconnect() throws MqttException {
+    private static void reconnect() throws MqttException {
         IMqttToken token = mqtt.connect();
         token.waitForCompletion();
     }
@@ -168,5 +168,14 @@ public class Bridge implements MqttCallback {
             return new ResponseEntity<>("Kafka Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>("Everything seems fine!\nMqtt Connection: " + mqtt.isConnected(), HttpStatus.OK);
+    }
+
+    public static ResponseEntity<String> reconnectToMqttBroker() {
+        try {
+            reconnect();
+        } catch (Exception e) {
+            return new ResponseEntity<>("Could not reconnect\n" + e.getMessage(), HttpStatus.EXPECTATION_FAILED);
+        }
+        return new ResponseEntity<>("Successfully reconnected!\n", HttpStatus.OK);
     }
 }

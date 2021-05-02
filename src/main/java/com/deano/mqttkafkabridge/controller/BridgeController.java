@@ -15,5 +15,9 @@ public class BridgeController {
         return Bridge.testForHealth();
     }
 
+    @GetMapping("/reconnectToMqtt")
+    public ResponseEntity<String> reconnectToMqtt() {
+        return Bridge.reconnectToMqttBroker();
+    }
 
 }
