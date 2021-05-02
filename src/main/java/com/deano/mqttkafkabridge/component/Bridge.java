@@ -30,7 +30,6 @@ public class Bridge implements MqttCallback {
     private Logger logger;
     public static MqttAsyncClient mqtt;
     private static AdminClient kafkaAdmin;
-    private final String NOTIFICATION = "notification/";
     public static Producer<String, String> kafkaProducer;
 
     public Bridge(Environment environment) {
@@ -62,13 +61,10 @@ public class Bridge implements MqttCallback {
                             .listTopics()
                             .names()
                             .get()
-                            .stream().map(t -> NOTIFICATION + t)
-                            .collect(Collectors.toList())
                             .toArray(String[]::new);
 
                     logger.log(Level.INFO, "Got topics");
                     if (topics != null && topics.length > 0) {
-                        logger.log(Level.INFO, "Topics not null and more than one");
                         subcribeToTopics(topics);
                     }
                     logger.trace("Thread to check new Topics going to sleep");
@@ -130,7 +126,7 @@ public class Bridge implements MqttCallback {
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         byte[] payload = message.getPayload();
-        logger.log(Level.INFO, "Message Arrived " + topic);
+        logger.log(Level.INFO, "Message Arrived");
 
         kafkaProducer.send((new ProducerRecord<>(topic, new String(payload))));
     }

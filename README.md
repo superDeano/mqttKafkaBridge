@@ -30,3 +30,7 @@ Because the bridge is a spring application, it can also be controlled using HTTP
     GET /bridge/reconnectToMqtt                 : Reconnect to MQTT broker
 
 The Health API returns an HTTP response of `200` if everything is fine and `500` or `Internal Server Error` which is useful for periodically checking the health of a pod like with GKE.
+
+
+### Advanced Code
+The bridge can be modified further to match a special use case regarding Kafka and MQTT Topics and the payloads.
