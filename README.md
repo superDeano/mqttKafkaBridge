@@ -1,30 +1,32 @@
-# mqttKafkaBridge
+# Mqtt Kafka Bridge
 
-Bridge which consumes MQTT messages and republishes them on Kafka on the same topic.
+Bridge built on top of Spring to consume MQTT messages and republish them to Kafka.
+The bridge periodically gets Kafka topics and subscribes to the same topics with the MQTT broker.
+
+## Deployment
+A docker image can be built to run in a container.
+Just open a terminal in the root folder of the project and use the following commands.
+
+To build the docker image
+
+    $ docker build -t {image:tag} . 
+
+To push the docker image to docker hub
+
+    $ docker push {image:tag}
 
 ## Usage
 
-    $ java -jar mqttKafkaBridge.jar [options...]
+The following environment variables need to be specified in order for the bridge to work:
 
-Where `options` are:
+    server.port                                 : Port the bridge will run on
+    spring.kafka.producer.bootstrap-servers     : Kafka connection URL
+    mqtt.servers                                : MQTT Broker connection URL
 
-    --help (-h)               : Show help
-    --id VAL                  : MQTT Client ID
-    --topics VAL              : MQTT topic filters (comma-separated)
-    --uri VAL                 : MQTT Server URI
-    --brokerlist (-b) VAL     : Kafka Broker List (comma-separated)
 
-If you don't specify any command-line options, it uses the following defaults:
+Because the bridge is a spring application, it can also be controlled using HTTP Requests. The following APIs are available:
 
-    id:      mqttKafkaBridge
-    topics:  '#' (all topics)
-    uri:     tcp://localhost:1883
-    b:       localhost:9092
+    GET /bridge/health                          : Shows the health of the bridge
+    GET /bridge/reconnectToMqtt                 : Reconnect to MQTT broker
 
-***Note***: you can't run more than one bridge using the default settings, since two clients cannot connect to the same MQTT server with the same client ID. Additionally, you will get multiple messages published to Kafka for each message published to MQTT. If you wish to run multiple instances, you'll need to divide up the topics among the instances, and make sure to give them different IDs.
-
-## Logging
-`mqttKafkaBridge` uses [log4j](http://logging.apache.org/log4j/2.x/) for logging, as do the [Paho](http://www.eclipse.org/paho/) and [Kafka](http://kafka.apache.org/) libraries it uses. There is a default `log4j.properties` file packaged with the jar which simply prints all messages of level `INFO` or greater to the console. If you want to customize logging, simply create your own `log4j.properties` file, and start up `mqttKafkaBridge` as follows:
-
-    $ java -Dlog4j.configuration=file:///path/to/log4j.properties -jar mqttKafkaBridge.jar [options...]
-
+The Health API returns an HTTP response of `200` if everything is fine and `500` or `Internal Server Error` which is useful for periodically checking the health of a pod like with GKE.
