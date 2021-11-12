@@ -23,6 +23,9 @@ import java.util.stream.Collectors;
 
 @Component
 @EnableAsync
+/*
+ * Class that houses the business logic for the bridge to talk with Kafka and MQTT
+ */
 public class Bridge implements MqttCallback {
     private final String mqttConnection;
     private final String kafkaConnection;
@@ -32,6 +35,10 @@ public class Bridge implements MqttCallback {
     private static AdminClient kafkaAdmin;
     public static Producer<String, String> kafkaProducer;
 
+    /**
+     * Public Constructor for the class Bridge
+     * Takes an Environment object to retrieve arguments from the environment variables
+     * */
     public Bridge(Environment environment) {
         this.kafkaConnection = environment.getProperty("spring.kafka.producer.bootstrap-servers");
         this.mqttConnection = environment.getProperty("mqtt.servers");
@@ -41,6 +48,9 @@ public class Bridge implements MqttCallback {
         periodicThread.start();
     }
 
+    /**
+     * Function that sets up the logger that outputs logs
+     */
     private void setUpLogger() {
         this.logger = Logger.getLogger(this.getClass().getName());
         ConsoleAppender consoleAppender = new ConsoleAppender();
